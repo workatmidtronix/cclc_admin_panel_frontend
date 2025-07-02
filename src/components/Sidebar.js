@@ -19,11 +19,11 @@ import {
   FaHome,
   FaChartBar,
   FaCalendarCheck,
-  
   FaHistory
 } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { IoSettingsSharp } from "react-icons/io5";
+
 const SidebarContainer = styled.div`
   width: 280px;
   height: 100vh;
@@ -165,21 +165,10 @@ const Sidebar = () => {
         { id: 'student-list', label: 'Student List', path: '/students/list' },
         ...(isAdmin ? [
           { id: 'assign-session', label: 'Assign Session', path: '/students/assign-session' },
-          // { id: 'bulk-send-document', label: 'Bulk Send Document', path: '/students/bulk-send-document' },
           { id: 'previous-course', label: 'Previous Course', path: '/students/previous-course' }
         ] : [])
       ]
     },
-    // {
-    //   id: 'reports',
-    //   label: 'Reports',
-    //   icon: <FaChartBar />,
-    //   subItems: [
-    //     { id: 'attendance-report', label: 'Attendance Report', path: '/reports/attendance' },
-    //     { id: 'midterm-report', label: 'Midterm Report', path: '/reports/midterm' },
-    //     { id: 'student-progress', label: 'Student Progress', path: '/reports/student-progress' }
-    //   ]
-    // },
     {
       id: 'sessions-courses',
       label: 'Sessions / Courses',
@@ -193,21 +182,9 @@ const Sidebar = () => {
       id: 'applications',
       label: 'Applications',
       icon: <FaFileAlt />,
-      subItems: [
-        { id: 'applied-candidates', label: 'Applied Candidates', path: '/applications/applied-candidates' },
-        // { id: 'all-applied', label: 'All Applied', path: '/applications/all-applied-candidates' }
-      ]
+      path: '/applications/all-applied-candidates',
+      
     },
-    // {
-    //   id: 'ita',
-    //   label: 'ITA Master Attendance',
-    //   icon: <FaFileSignature />,
-    //   subItems: [
-    //     { id: 'upload-ita-attendance', label: 'Upload ITA Attendance Signed by Student', path: '/ita/upload-attendance' },
-    //     { id: 'ita-master', label: 'ITA Master', path: '/ita/master' },
-    //     { id: 'signed-ita-attendance', label: 'Signed ITA Attendance', path: '/ita/signed-attendance' }
-    //   ]
-    // },
     {
       id: 'notifications',
       label: 'Notifications',
@@ -218,7 +195,6 @@ const Sidebar = () => {
         { id: 'send-sms', label: 'Send SMS', path: '/notifications/send-sms' },
         { id: 'all-sms', label: 'All SMS', path: '/notifications/all-sms' },
         { id: 'sms-chat', label: 'SMS Chat', path: '/notifications/sms-chat' },
-        // { id: 'send-password', label: 'Send Password', path: '/notifications/send-password' }
       ]
     },
     {
@@ -226,23 +202,11 @@ const Sidebar = () => {
       label: 'Attendance',
       icon: <FaCalendarCheck />,
       subItems: [
-        { id: 'add-attendance', label: 'Add Attendance', path: '/attendance/add' },
-        { id: 'attendance-report', label: 'Attendance Report', path: '/attendance/report' },
+        // { id: 'add-attendance', label: 'Add Attendance', path: '/attendance/add' },
+        { id: 'attendance-report', label: 'Attendance Dashboard', path: 'https://office.ngteco.com/dashboard', external: true },
         { id: 'monthly-attendance', label: 'Monthly Attendance', path: '/attendance/monthly' }
       ]
     },
-    // {
-    //   id: 'grades',
-    //   label: 'Grades',
-    //   icon: <FaChartLine />,
-    //   subItems: [
-    //     { id: 'grade-category', label: 'Grade Category', path: '/grades/category' },
-    //     { id: 'grade-columns', label: 'Grade Columns', path: '/grades/columns' },
-    //     { id: 'add-grade', label: 'Add Grade', path: '/grades/add' },
-    //     { id: 'all-grades', label: 'All Grades', path: '/grades/all' },
-    //     { id: 'consolidated-grade', label: 'Consolidated Grade', path: '/grades/consolidated' }
-    //   ]
-    // },
     (isAdmin && {
       id: 'staff',
       label: 'Staff Management',
@@ -270,20 +234,6 @@ const Sidebar = () => {
         { id: 'master-data', label: 'Master Data', path: '/profile/master-data' }
       ]
     }),
-
-    
-    (isAdmin && {
-      id: 'recent-activities',
-      label: 'Recent Activities',
-      icon: <FaHistory />,
-      path: '/recent-activities'
-    })
-    // ...(isAdmin ? [{
-    //   id: 'update-course-session',
-    //   label: 'Update Course & Session',
-    //   icon: <FaEdit />,
-    //   path: '/update-course-session'
-    // }] : [])
   ];
 
   const toggleMenu = (menuId) => {
@@ -293,8 +243,12 @@ const Sidebar = () => {
     }));
   };
 
-  const handleNavigation = (path) => {
-    navigate(path);
+  const handleNavigation = (path, external = false) => {
+    if (external) {
+      window.open(path, '_blank', 'noopener,noreferrer');
+    } else {
+      navigate(path);
+    }
   };
 
   const isPathActive = (path) => {
@@ -302,15 +256,14 @@ const Sidebar = () => {
   };
 
   const isMenuActive = (item) => {
-    if (item.path) {
+    if (item.path && !item.external) {
       return isPathActive(item.path);
     }
-    return item.subItems?.some(subItem => isPathActive(subItem.path));
+    return item.subItems?.some(subItem => !subItem.external && isPathActive(subItem.path));
   };
 
   return (
     <SidebarContainer>
-
       <Header onClick={() => handleNavigation('/dashboard')}>
         <Logo>CCLC</Logo>
         <Subtitle>Admin Panel</Subtitle>
@@ -325,7 +278,7 @@ const Sidebar = () => {
                 if (item.subItems) {
                   toggleMenu(item.id);
                 } else {
-                  handleNavigation(item.path);
+                  handleNavigation(item.path, item.external);
                 }
               }}
             >
@@ -345,8 +298,8 @@ const Sidebar = () => {
                 {item.subItems.map(subItem => (
                   <SubNavItem
                     key={subItem.id}
-                    active={isPathActive(subItem.path)}
-                    onClick={() => handleNavigation(subItem.path)}
+                    active={!subItem.external && isPathActive(subItem.path)}
+                    onClick={() => handleNavigation(subItem.path, subItem.external)}
                   >
                     {subItem.label}
                   </SubNavItem>
@@ -360,4 +313,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar; 
+export default Sidebar;

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { FaUserGraduate, FaChalkboardTeacher, FaBook, FaCalendarAlt, FaUserPlus, FaUserFriends, FaEnvelope, FaSync, FaTimes, FaUsers, FaChalkboard, FaFileUpload, FaCalendar, FaUpload, FaHistory, FaGraduationCap, FaChartLine, FaPlus, FaSearch, FaList, FaEllipsisV, FaFileAlt, FaDownload, FaEdit, FaTrash, FaEye, FaBell, FaSms, FaClock, FaMapMarkerAlt, FaUserTie, FaClipboardList, FaCog, FaSignOutAlt } from 'react-icons/fa';
-import { fetchDashboardStats, fetchRecentActivities, fetchDashboardData } from '../store/slices/dashboardSlice';
+import { fetchDashboardStats,  fetchDashboardData } from '../store/slices/dashboardSlice';
 import { useNavigate } from 'react-router-dom';
 import Calendar from '../components/Calendar';
 import { useMasterData } from '../hooks/useMasterData';
@@ -136,13 +136,13 @@ const CalendarSection = styled.div`
   margin-bottom: 30px;
 `;
 
-const RecentActivitiesSection = styled.div`
-  background: white;
-  border-radius: 15px;
-  padding: 30px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-  margin-bottom: 30px;
-`;
+// const RecentActivitiesSection = styled.div`
+//   background: white;
+//   border-radius: 15px;
+//   padding: 30px;
+//   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+//   margin-bottom: 30px;
+// `;
 
 const ActivityItem = styled.div`
   display: flex;
@@ -493,15 +493,14 @@ const Dashboard = () => {
 console.log(user);
   useEffect(() => {
     dispatch(fetchDashboardStats());
-    dispatch(fetchRecentActivities());
 
   }, [dispatch]);
 
   // Helper function to get activity icon
   const getActivityIcon = (type) => {
     switch (type) {
-      case 'student_enrollment':
-        return <FaUserGraduate />;
+      // case 'student_enrollment':
+      //   return <FaUserGraduate />;
       case 'course_creation':
         return <FaBook />;
       case 'grade_update':

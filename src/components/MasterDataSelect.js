@@ -56,6 +56,9 @@ export const CourseSelect = ({ value, onChange, placeholder = "Select a course",
     return <LoadingText>Loading courses...</LoadingText>;
   }
 
+  // Ensure courses is an array before mapping
+  const coursesArray = Array.isArray(courses) ? courses : [];
+
   return (
     <Select
       value={value || ''}
@@ -64,7 +67,7 @@ export const CourseSelect = ({ value, onChange, placeholder = "Select a course",
       {...props}
     >
       <Option value="">{placeholder}</Option>
-      {courses.map(course => (
+      {coursesArray.map(course => (
         <Option key={course.id} value={course.id}>
           {course.course_name}
         </Option>
@@ -81,6 +84,9 @@ export const SessionSelect = ({ value, onChange, placeholder = "Select a session
     return <LoadingText>Loading sessions...</LoadingText>;
   }
 
+  // Ensure sessions is an array before mapping
+  const sessionsArray = Array.isArray(sessions) ? sessions : [];
+
   return (
     <Select
       value={value || ''}
@@ -89,7 +95,7 @@ export const SessionSelect = ({ value, onChange, placeholder = "Select a session
       {...props}
     >
       <Option value="">{placeholder}</Option>
-      {sessions.map(session => (
+      {sessionsArray.map(session => (
         <Option key={session.id} value={session.id}>
           {session.session_name}
         </Option>
@@ -106,6 +112,9 @@ export const InstructorSelect = ({ value, onChange, placeholder = "Select an ins
     return <LoadingText>Loading instructors...</LoadingText>;
   }
 
+  // Ensure instructors is an array before mapping
+  const instructorsArray = Array.isArray(instructors) ? instructors : [];
+
   return (
     <Select
       value={value || ''}
@@ -114,7 +123,7 @@ export const InstructorSelect = ({ value, onChange, placeholder = "Select an ins
       {...props}
     >
       <Option value="">{placeholder}</Option>
-      {instructors.map(instructor => (
+      {instructorsArray.map(instructor => (
         <Option key={instructor.id} value={instructor.id}>
           {instructor.name || 'Unnamed Instructor'}
         </Option>
@@ -131,6 +140,9 @@ export const SemesterSelect = ({ value, onChange, placeholder = "Select a semest
     return <LoadingText>Loading semesters...</LoadingText>;
   }
 
+  // Ensure semesters is an array before mapping
+  const semestersArray = Array.isArray(semesters) ? semesters : [];
+
   return (
     <Select
       value={value || ''}
@@ -139,7 +151,7 @@ export const SemesterSelect = ({ value, onChange, placeholder = "Select a semest
       {...props}
     >
       <Option value="">{placeholder}</Option>
-      {semesters.map(semester => (
+      {semestersArray.map(semester => (
         <Option key={semester.id} value={semester.id}>
           {semester.semester_name}
         </Option>
@@ -156,6 +168,9 @@ export const DepartmentSelect = ({ value, onChange, placeholder = "Select a depa
     return <LoadingText>Loading departments...</LoadingText>;
   }
 
+  // Ensure departments is an array before mapping
+  const departmentsArray = Array.isArray(departments) ? departments : [];
+
   return (
     <Select
       value={value || ''}
@@ -164,7 +179,7 @@ export const DepartmentSelect = ({ value, onChange, placeholder = "Select a depa
       {...props}
     >
       <Option value="">{placeholder}</Option>
-      {departments.map(department => (
+      {departmentsArray.map(department => (
         <Option key={department.id} value={department.id}>
           {department.department_name}
         </Option>
@@ -185,6 +200,9 @@ console.log("pppppptttttt",students);
     return <ErrorText>Error loading students: {fetchError}</ErrorText>;
   }
 
+  // Ensure students is an array before mapping
+  const studentsArray = Array.isArray(students) ? students : [];
+
   return (
     <div>
       <Select 
@@ -194,7 +212,7 @@ console.log("pppppptttttt",students);
         style={{ borderColor: error ? '#dc3545' : '#e1e5e9' }}
       >
         <Option value="">{placeholder}</Option>
-        {students.map(student => (
+        {studentsArray.map(student => (
           <Option key={student.id} value={student.id}>
             {student.firstName} {student.lastName}
           </Option>

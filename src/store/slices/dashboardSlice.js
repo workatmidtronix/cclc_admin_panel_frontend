@@ -33,31 +33,6 @@ export const fetchDashboardStats = createAsyncThunk(
   }
 );
 
-// Fetch recent activities from API
-export const fetchRecentActivities = createAsyncThunk(
-  'dashboard/fetchActivities',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await fetch('/api/dashboard/recent-activities', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch recent activities');
-      }
-
-      const data = await response.json();
-      return data.activities;
-    } catch (error) {
-      return rejectWithValue(error.message || 'Failed to fetch recent activities');
-    }
-  }
-);
-
 const initialState = {
   stats: {
     totalStudents: 0,
@@ -67,7 +42,6 @@ const initialState = {
     totalEnrollments: 0,
     pendingApplications: 0,
   },
-  recentActivities: [],
   isLoading: false,
   error: null,
 };
@@ -93,20 +67,6 @@ const dashboardSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchDashboardStats.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      })
-      // Fetch activities cases
-      .addCase(fetchRecentActivities.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(fetchRecentActivities.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.recentActivities = action.payload;
-        state.error = null;
-      })
-      .addCase(fetchRecentActivities.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

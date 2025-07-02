@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FaTimes, FaPhone } from 'react-icons/fa';
+import { FaTimes, FaPhone, FaEnvelope, FaMapMarkerAlt, FaCalendar, FaUser, FaGraduationCap, FaFileAlt, FaChevronDown, FaChevronRight } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { getApplications } from '../../utils/applicationsApi';
 import { showSuccess, showError } from '../../components/CustomAlert';
@@ -191,6 +191,18 @@ const Td = styled.td`
   }
 `;
 
+const ExpandButton = styled.button`
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #6c757d;
+  padding: 5px;
+  
+  &:hover {
+    color: rgb(51, 66, 147);
+  }
+`;
+
 const EmailLink = styled.a`
   color: rgb(51, 66, 147);
   text-decoration: none;
@@ -215,6 +227,139 @@ const PhoneLink = styled.a`
 const PreferenceText = styled.span`
   color: #495057;
   font-size: 0.85rem;
+`;
+
+const StatusBadge = styled.span`
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: ${props => {
+    switch (props.status) {
+      case 'approved': return '#d4edda';
+      case 'pending': return '#fff3cd';
+      case 'rejected': return '#f8d7da';
+      default: return '#e9ecef';
+    }
+  }};
+  color: ${props => {
+    switch (props.status) {
+      case 'approved': return '#155724';
+      case 'pending': return '#856404';
+      case 'rejected': return '#721c24';
+      default: return '#6c757d';
+    }
+  }};
+`;
+
+const ExpandedRow = styled.tr`
+  background: #f8f9fa;
+`;
+
+const ExpandedCell = styled.td`
+  padding: 20px;
+  border-top: 1px solid #e9ecef;
+`;
+
+const DetailGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+`;
+
+const DetailSection = styled.div`
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+`;
+
+const SectionTitle = styled.h4`
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const DetailItem = styled.div`
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const DetailLabel = styled.span`
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.8rem;
+  min-width: 120px;
+`;
+
+const DetailValue = styled.span`
+  color: #6c757d;
+  font-size: 0.8rem;
+`;
+
+const FileLink = styled.a`
+  color: rgb(51, 66, 147);
+  text-decoration: none;
+  font-size: 0.8rem;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const AcceptButton = styled.button`
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  min-width: 120px;
+
+  &:hover:not(:disabled) {
+    background: #218838;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+`;
+
+const RejectButton = styled.button`
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  min-width: 120px;
+
+  &:hover:not(:disabled) {
+    background: #c82333;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
 `;
 
 const LoadingContainer = styled.div`
@@ -242,6 +387,7 @@ const AllAppliedCandidates = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [expandedRows, setExpandedRows] = useState(new Set());
   const { students, isLoading } = useSelector(state => state.students);
 
   // Fetch applications on component mount and when search term changes
@@ -293,6 +439,18 @@ const AllAppliedCandidates = () => {
     });
   };
 
+  const toggleExpandedRow = (applicationId) => {
+    setExpandedRows(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(applicationId)) {
+        newSet.delete(applicationId);
+      } else {
+        newSet.add(applicationId);
+      }
+      return newSet;
+    });
+  };
+
   const formatDateTime = (dateTimeString) => {
     if (!dateTimeString) return '';
     const date = new Date(dateTimeString);
@@ -307,11 +465,187 @@ const AllAppliedCandidates = () => {
     });
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      month: '2-digit',
+      day: '2-digit',
+      year: '2-digit'
+    });
+  };
+
+  const handleAcceptApplication = async (applicationId) => {
+    try {
+      // First, update the application status to approved
+      const statusResponse = await fetch(`/api/applications/${applicationId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: 'Approved' })
+      });
+
+      const statusData = await statusResponse.json();
+
+      if (!statusData.success) {
+        showError(statusData.message || 'Failed to accept application');
+        return;
+      }
+
+      // Get the application data to register as student
+      const applicationResponse = await fetch(`/api/applications/${applicationId}`);
+      const applicationData = await applicationResponse.json();
+
+      if (!applicationData.success) {
+        showError('Failed to fetch application data for student registration');
+        return;
+      }
+
+      const application = applicationData.application;
+
+      // Helper function to format dates properly
+      const formatDateForDatabase = (dateString) => {
+        if (!dateString) return null;
+        try {
+          const date = new Date(dateString);
+          if (!isNaN(date.getTime())) {
+            return date.toISOString().split('T')[0]; // YYYY-MM-DD format
+          }
+        } catch (error) {
+          console.error('Error formatting date:', error);
+        }
+        return null;
+      };
+
+      // Format all date fields properly
+      const formattedDateOfBirth = formatDateForDatabase(application.date_of_birth);
+      const formattedTaraItaCompletionDate = formatDateForDatabase(application.tara_ita_packet_date);
+      const formattedInfoSessionDate = formatDateForDatabase(application.info_session_date);
+      const formattedDateOfJoining = formatDateForDatabase(application.date_of_joining);
+
+      // Register the applicant as a student
+      const studentResponse = await fetch('/api/students', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: application.first_name || '',
+          lastName: application.last_name || '',
+          email: application.email_address || '',
+          phone: application.contact_number || '',
+          dateOfBirth: formattedDateOfBirth,
+          course: application.course || '',
+          department: application.department || '',
+          studentNotes: application.student_notes || '',
+          session: application.session || '',
+          semester: application.semester || '',
+          registrationNumber: `${application.session || 'UNK'}-${application.course || 'UNK'}-${application.id}`,
+          socialSecurityNumber: application.social_security_number || null,
+          driversLicense: application.driver_license_number || '',
+          studentPcpInfo: application.student_pcp_info || '',
+          studentPcpPhone: application.student_pcp_phone || '',
+          emergencyContactInfo: application.emergency_contact_info || '',
+          emergencyContactPhone: application.emergency_contact_phone || '',
+          otherEmergencyContact: application.other_emergency_contact || '',
+          caseworkerName: application.caseworker_name || '',
+          workforceCenter: application.workforce_center || '',
+          taraItaCompletionDate: formattedTaraItaCompletionDate, // Use formatted date
+          infoSessionDate: formattedInfoSessionDate, // Use formatted date
+          coursePref1: application.course_interest_1 || '',
+          daysPref1: application.days_preferred_1 || '',
+          locationPref1: application.location_preference_1 || '',
+          coursePref2: application.course_interest_2 || '',
+          daysPref2: application.days_preferred_2 || '',
+          locationPref2: application.location_preference_2 || '',
+          attendedInfoSession: application.attended_info_session || false,
+          infoSessionLocation: application.filled_out_where || '',
+          additionalComments: application.additional_comments || '',
+          signature: application.signature || '',
+          addressLine1: application.address || '',
+          state: application.state_province || '',
+          gender: application.gender === 'Male' || application.gender === 'Female' ? application.gender : 'Other',
+          religion: application.religion || '',
+          nationality: application.nationality || '',
+          dateOfJoining: formattedDateOfJoining, // Use formatted date
+          status: 'Active',
+          // Generate login ID and password for the new student
+          loginId: `${(application.first_name || 'user').toLowerCase()}${(application.last_name || 'name').toLowerCase()}${Date.now()}`,
+          password: `Welcome${new Date().getFullYear()}!`
+        })
+      });
+
+      const studentData = await studentResponse.json();
+
+      if (studentData.success) {
+        // Update local state immediately for better UX
+        setApplications(prev => prev.map(app => 
+          app.id === applicationId 
+            ? { ...app, status: 'approved' }
+            : app
+        ));
+        
+        showSuccess(`Application accepted successfully! Student registered with ID: ${studentData.studentId}`);
+      } else {
+        // If student registration fails, revert the application status
+        await fetch(`/api/applications/${applicationId}/status`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ status: 'Pending' })
+        });
+        
+        // Show detailed error message
+        if (studentData.errors) {
+          const errorMessages = studentData.errors.map(err => `${err.param}: ${err.msg}`).join(', ');
+          showError(`Validation errors: ${errorMessages}`);
+        } else {
+          showError(studentData.message || 'Failed to register student. Application status reverted.');
+        }
+      }
+    } catch (error) {
+      console.error('Error accepting application:', error);
+      showError('Failed to accept application. Please try again.');
+    }
+  };
+
+  const handleRejectApplication = async (applicationId) => {
+    try {
+      const response = await fetch(`/api/applications/${applicationId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: 'Rejected' })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Update local state immediately for better UX
+        setApplications(prev => prev.map(app => 
+          app.id === applicationId 
+            ? { ...app, status: 'rejected' }
+            : app
+        ));
+        
+        showSuccess('Application rejected successfully!');
+      } else {
+        showError(data.message || 'Failed to reject application');
+      }
+    } catch (error) {
+      console.error('Error rejecting application:', error);
+      showError('Failed to reject application. Please try again.');
+    }
+  };
+
   if (loading) {
     return (
       <Container>
         <Header>
-          <Title>All Applied Candidates</Title>
+          <Title>Applications</Title>
         </Header>
         <LoadingContainer>
           Loading applications...
@@ -324,7 +658,7 @@ const AllAppliedCandidates = () => {
     return (
       <Container>
         <Header>
-          <Title>All Applied Candidates</Title>
+          <Title>Applications</Title>
         </Header>
         <ErrorContainer>
           <div>
@@ -341,7 +675,7 @@ const AllAppliedCandidates = () => {
   return (
     <Container>
       <Header>
-        <Title>All Applied Candidates</Title>
+        <Title>Applications</Title>
         {/* <ActionButtons>
           <SaveButton onClick={handleSaveChanges}>
             Save Changes
@@ -351,7 +685,7 @@ const AllAppliedCandidates = () => {
           </RemoveButton>
         </ActionButtons> */}
       </Header>
-
+{/* 
       <SearchContainer>
         <SearchBar>
           <SearchLabel>SEARCH</SearchLabel>
@@ -365,65 +699,314 @@ const AllAppliedCandidates = () => {
             <FaTimes />
           </ClearButton>
         </SearchBar>
-      </SearchContainer>
+      </SearchContainer> */}
 
       <TableContainer>
-        <TableControls>
+        {/* <TableControls>
           <CheckboxInput type="checkbox" />
-        </TableControls>
+        </TableControls> */}
 
         <TableWrapper>
           <Table>
             <Thead>
               <Tr>
-                <Th style={{ width: '50px' }}></Th>
-                <SortableHeader>Last Name ↕</SortableHeader>
+                <Th style={{ width: '50px' }}>Expand</Th>
+                <SortableHeader>Last Name ↕</SortableHeader >
                 <SortableHeader>First Name ↕</SortableHeader>
-                <SortableHeader>Added Time ↕</SortableHeader>
                 <SortableHeader>Email Address ↕</SortableHeader>
-                <SortableHeader>Days Preferred - 1 ↕</SortableHeader>
-                <SortableHeader>Days Preferred - 2 ↕</SortableHeader>
-                <SortableHeader>Phone number ↕</SortableHeader>
+                <SortableHeader>Phone Number ↕</SortableHeader>
+                <SortableHeader>Course Interest ↕</SortableHeader>
+                <SortableHeader>Status ↕</SortableHeader>
+                <SortableHeader>Applied Date ↕</SortableHeader>
               </Tr>
             </Thead>
             <Tbody>
               {applications.length === 0 ? (
                 <Tr>
-                  <Td colSpan="8" style={{ textAlign: 'center', padding: '50px' }}>
+                  <Td colSpan="9" style={{ textAlign: 'center', padding: '50px' }}>
                     {searchTerm ? 'No applications found matching your search criteria.' : 'No applications found.'}
                   </Td>
                 </Tr>
               ) : (
                 applications.map((application) => (
-                  <Tr key={application.id}>
-                    <Td>
+                  <React.Fragment key={application.id}>
+                    <Tr>
+                      {/* <Td>
                       <CheckboxInput
                         type="checkbox"
                         checked={selectedCandidates.includes(application.id)}
                         onChange={() => handleSelectCandidate(application.id)}
                       />
+                      </Td> */}
+                      <Td>
+                        <ExpandButton onClick={() => toggleExpandedRow(application.id)}>
+                          {expandedRows.has(application.id) ? <FaChevronDown /> : <FaChevronRight />}
+                        </ExpandButton>
                     </Td>
                     <Td style={{ fontWeight: '500' }}>{application.last_name}</Td>
                     <Td style={{ fontWeight: '500' }}>{application.first_name}</Td>
-                    <Td>{formatDateTime(application.added_time)}</Td>
                     <Td>
-                      <EmailLink href={`mailto:${application.email}`}>
-                        {application.email}
+                        <EmailLink href={`mailto:${application.email_address}`} >
+                          <FaEnvelope size={12} style={{marginRight:10}} />
+                          {application.email_address}
                       </EmailLink>
                     </Td>
                     <Td>
-                      <PreferenceText>{application.days_preferred_1 || '-'}</PreferenceText>
+                        <PhoneLink href={`tel:${application.contact_number}`}>
+                          <FaPhone size={12} />
+                          {application.contact_number}
+                        </PhoneLink>
                     </Td>
                     <Td>
-                      <PreferenceText>{application.days_preferred_2 || '-'}</PreferenceText>
+                        <PreferenceText>{application.course_interest_1 || '-'}</PreferenceText>
                     </Td>
                     <Td>
-                      <PhoneLink href={`tel:${application.phone_number}`}>
-                        <FaPhone size={12} />
-                        {application.phone_number}
-                      </PhoneLink>
+                        <StatusBadge status={application.status || 'pending'}>
+                          {application.status || 'pending'}
+                        </StatusBadge>
                     </Td>
+                      <Td>{formatDateTime(application.created_at)}</Td>
                   </Tr>
+                    {expandedRows.has(application.id) && (
+                      <ExpandedRow>
+                        <ExpandedCell colSpan="9">
+                          <DetailGrid>
+                            <DetailSection>
+                              <SectionTitle>
+                                <FaUser />
+                                Personal Information
+                              </SectionTitle>
+                              <DetailItem>
+                                <DetailLabel>Date of Birth:</DetailLabel>
+                                <DetailValue>{formatDate(application.date_of_birth)}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Gender:</DetailLabel>
+                                <DetailValue>{application.gender || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Nationality:</DetailLabel>
+                                <DetailValue>{application.nationality || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Religion:</DetailLabel>
+                                <DetailValue>{application.religion || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Address:</DetailLabel>
+                                <DetailValue>{application.address || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>State/Province:</DetailLabel>
+                                <DetailValue>{application.state_province || '-'}</DetailValue>
+                              </DetailItem>
+                            </DetailSection>
+
+                            <DetailSection>
+                              <SectionTitle>
+                                <FaGraduationCap />
+                                Academic Information
+                              </SectionTitle>
+                              <DetailItem>
+                                <DetailLabel>Department:</DetailLabel>
+                                <DetailValue>{application.department || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Semester:</DetailLabel>
+                                <DetailValue>{application.semester || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Session:</DetailLabel>
+                                <DetailValue>{application.session || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Course Interest 1:</DetailLabel>
+                                <DetailValue>{application.course_interest_1 || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Days Preferred 1:</DetailLabel>
+                                <DetailValue>{application.days_preferred_1 || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Location Preference 1:</DetailLabel>
+                                <DetailValue>{application.location_preference_1 || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Course Interest 2:</DetailLabel>
+                                <DetailValue>{application.course_interest_2 || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Days Preferred 2:</DetailLabel>
+                                <DetailValue>{application.days_preferred_2 || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Location Preference 2:</DetailLabel>
+                                <DetailValue>{application.location_preference_2 || '-'}</DetailValue>
+                              </DetailItem>
+                            </DetailSection>
+
+                            <DetailSection>
+                              <SectionTitle>
+                                <FaPhone />
+                                Emergency Contacts
+                              </SectionTitle>
+                              <DetailItem>
+                                <DetailLabel>Emergency Contact:</DetailLabel>
+                                <DetailValue>{application.emergency_contact_info || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Emergency Phone:</DetailLabel>
+                                <DetailValue>{application.emergency_contact_phone || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Other Emergency:</DetailLabel>
+                                <DetailValue>{application.other_emergency_contact || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>PCP Info:</DetailLabel>
+                                <DetailValue>{application.student_pcp_info || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>PCP Phone:</DetailLabel>
+                                <DetailValue>{application.student_pcp_phone || '-'}</DetailValue>
+                              </DetailItem>
+                            </DetailSection>
+
+                            <DetailSection>
+                              <SectionTitle>
+                                <FaFileAlt />
+                                Documents & Files
+                              </SectionTitle>
+                              <DetailItem>
+                                <DetailLabel>Photo:</DetailLabel>
+                                <DetailValue>
+                                  {application.photo_path ? (
+                                    <FileLink href={`/uploads/${application.photo_path}`} target="_blank">
+                                      View Photo
+                                    </FileLink>
+                                  ) : '-'}
+                                </DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Social Security:</DetailLabel>
+                                <DetailValue>
+                                  {application.social_security_path ? (
+                                    <FileLink href={`/uploads/${application.social_security_path}`} target="_blank">
+                                      View Document
+                                    </FileLink>
+                                  ) : '-'}
+                                </DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Driver License:</DetailLabel>
+                                <DetailValue>
+                                  {application.dl_path ? (
+                                    <FileLink href={`/uploads/${application.dl_path}`} target="_blank">
+                                      View Document
+                                    </FileLink>
+                                  ) : '-'}
+                                </DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>TARA ITA:</DetailLabel>
+                                <DetailValue>
+                                  {application.tara_ita_path ? (
+                                    <FileLink href={`/uploads/${application.tara_ita_path}`} target="_blank">
+                                      View Document
+                                    </FileLink>
+                                  ) : '-'}
+                                </DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Voucher Dates:</DetailLabel>
+                                <DetailValue>
+                                  {application.voucher_dates_path ? (
+                                    <FileLink href={`/uploads/${application.voucher_dates_path}`} target="_blank">
+                                      View Document
+                                    </FileLink>
+                                  ) : '-'}
+                                </DetailValue>
+                              </DetailItem>
+                            </DetailSection>
+
+                            <DetailSection>
+                              <SectionTitle>
+                                <FaCalendar />
+                                Additional Information
+                              </SectionTitle>
+                              <DetailItem>
+                                <DetailLabel>Date of Joining:</DetailLabel>
+                                <DetailValue>{formatDate(application.date_of_joining)}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Info Session Date:</DetailLabel>
+                                <DetailValue>{formatDate(application.info_session_date)}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>TARA ITA Date:</DetailLabel>
+                                <DetailValue>{formatDate(application.tara_ita_packet_date)}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Attended Info Session:</DetailLabel>
+                                <DetailValue>{application.attended_info_session || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Filled Out Where:</DetailLabel>
+                                <DetailValue>{application.filled_out_where || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Caseworker:</DetailLabel>
+                                <DetailValue>{application.caseworker_name || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Workforce Center:</DetailLabel>
+                                <DetailValue>{application.workforce_center || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Student Notes:</DetailLabel>
+                                <DetailValue>{application.student_notes || '-'}</DetailValue>
+                              </DetailItem>
+                              <DetailItem>
+                                <DetailLabel>Additional Comments:</DetailLabel>
+                                <DetailValue>{application.additional_comments || '-'}</DetailValue>
+                              </DetailItem>
+                            </DetailSection>
+
+                            <DetailSection>
+                              <SectionTitle>
+                                <FaUser />
+                                Application Actions
+                              </SectionTitle>
+                              <DetailItem style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '15px' }}>
+                                <div style={{ display: 'flex', gap: '15px', width: '100%' }}>
+                                  <AcceptButton 
+                                    onClick={() => handleAcceptApplication(application.id)}
+                                    disabled={application.status === 'approved'}
+                                  >
+                                    {application.status === 'approved' ? 'Already Accepted' : 'Accept Application'}
+                                  </AcceptButton>
+                                  <RejectButton 
+                                    onClick={() => handleRejectApplication(application.id)}
+                                    disabled={application.status === 'rejected'}
+                                  >
+                                    {application.status === 'rejected' ? 'Already Rejected' : 'Reject Application'}
+                                  </RejectButton>
+                                </div>
+                                {application.status && (
+                                  <div style={{ marginTop: '10px' }}>
+                                    <DetailLabel>Current Status:</DetailLabel>
+                                    <StatusBadge status={application.status} style={{ marginLeft: '10px' }}>
+                                      {application.status}
+                                    </StatusBadge>
+                                  </div>
+                                )}
+                              </DetailItem>
+                            </DetailSection>
+                          </DetailGrid>
+                        </ExpandedCell>
+                      </ExpandedRow>
+                    )}
+                  </React.Fragment>
                 ))
               )}
             </Tbody>

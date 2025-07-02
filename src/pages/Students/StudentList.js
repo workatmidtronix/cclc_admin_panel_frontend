@@ -486,10 +486,22 @@ function StudentDetailsModal({ student, onClose }) {
               ) : (
                 <tr><td colSpan={4}>No signed documents found</td></tr>
               )}
+              <tr>
+                <th>Student Acknowledgment Form</th>
+                <td colSpan={3}>
+                  <FileLink
+                    as="button"
+                    style={{ background: 'none', border: 'none', color: '#3366cc', cursor: 'pointer', textDecoration: 'underline', fontSize: '0.97rem' }}
+                    onClick={() => window.open(`/student-acknowledgment/${details.student.email}`, '_blank')}
+                  >
+                    View Student Acknowledgment Form
+                  </FileLink>
+                </td>
+              </tr>
             </tbody>
           </DetailsTable>
 
-          <SectionTitle>Signed ITA Attendance Details</SectionTitle>
+          {/* <SectionTitle>Signed ITA Attendance Details</SectionTitle>
           <DetailsTable>
             <tbody style={{textAlign: 'left'}}>
               <tr><th>Date</th><th>Status</th><th>Hours Completed</th><th>Instructor</th><th>Course</th></tr>
@@ -507,9 +519,9 @@ function StudentDetailsModal({ student, onClose }) {
                 <tr><td colSpan={5}>No ITA attendance records found</td></tr>
               )}
             </tbody>
-          </DetailsTable>
+          </DetailsTable> */}
 
-          <SectionTitle>Previous Course Details</SectionTitle>
+          {/* <SectionTitle>Previous Course Details</SectionTitle>
           <DetailsTable>
             <tbody style={{textAlign: 'left'}}>
               <tr><th>Course</th><th>Session</th><th>Moved Date</th><th>Student Course Status</th></tr>
@@ -546,7 +558,7 @@ function StudentDetailsModal({ student, onClose }) {
                 <tr><td colSpan={5}>No grade records found</td></tr>
               )}
             </tbody>
-          </DetailsTable>
+          </DetailsTable> */}
 
           <SectionTitle>Attendance Records</SectionTitle>
           <DetailsTable>
@@ -700,9 +712,9 @@ const StudentList = () => {
               <SortableHeader>Gender</SortableHeader>
               <SortableHeader>Phone Number</SortableHeader>
               <SortableHeader>Enrollment Date</SortableHeader>
-              <SortableHeader style={{ textAlign: 'left' }}>Download Documents</SortableHeader>
+              {/* <SortableHeader style={{ textAlign: 'left' }}>Download Documents</SortableHeader> */}
               <SortableHeader style={{ textAlign: 'left' }}>Details</SortableHeader>
-              <SortableHeader style={{ textAlign: 'left' }}>Actions</SortableHeader>
+              {/* <SortableHeader style={{ textAlign: 'left' }}>Actions</SortableHeader> */}
             </Tr>
           </Thead>
           <Tbody>
@@ -724,21 +736,21 @@ const StudentList = () => {
                   {student.phone}
                 </Td>
                 <Td style={{ fontSize: '0.85rem' }}>{student.enrollmentDate}</Td>
-                <Td>
+                {/* <Td>
                   <ActionButton action="download" onClick={() => handleDownload(student.id)}>
                     Download
                   </ActionButton>
-                </Td>
+                </Td> */}
                 <Td>
                   <ActionButton action="details" onClick={() => { setSelectedStudent(student); setShowDetailsModal(true); }}>
                     Details
                   </ActionButton>
                 </Td>
-                <Td>
+                {/* <Td>
                   <ActionButton action="delete" onClick={() => handleDelete(student.id)}>
                     Delete
                   </ActionButton>
-                </Td>
+                </Td> */}
               </Tr>
             ))}
           </Tbody>

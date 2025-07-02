@@ -12,25 +12,16 @@ import AppInitializer from './components/AppInitializer';
 
 // Pages
 import Dashboard from './pages/Dashboard';
-import RecentActivities from './pages/RecentActivities';
 import AddStudent from './pages/Students/AddStudent';
 import AssignSession from './pages/Students/AssignSession';
 import StudentList from './pages/Students/StudentList';
 import BulkSendDocument from './pages/Students/BulkSendDocument';
 import PreviousCourse from './pages/Students/PreviousCourse';
-import AttendanceReport from './pages/Reports/AttendanceReport';
-import MidtermReport from './pages/Reports/MidtermReport';
-import StudentProgressReport from './pages/Reports/StudentProgressReport';
 import AppliedCandidates from './pages/Applications/AppliedCandidates';
 import AllAppliedCandidates from './pages/Applications/AllAppliedCandidates';
 import AddAttendance from './pages/Attendance/AddAttendance';
 import AttendanceReportPage from './pages/Attendance/AttendanceReport';
 import MonthlyAttendance from './pages/Attendance/MonthlyAttendance';
-import GradeCategory from './pages/Grades/GradeCategory';
-import GradeColumns from './pages/Grades/GradeColumns';
-import Grade from './pages/Grades/Grade';
-import AllGrades from './pages/Grades/AllGrades';
-import ConsolidatedGrade from './pages/Grades/ConsolidatedGrade';
 
 // Instructor Management
 import AddEmployee from './pages/Instructors/AddEmployee';
@@ -43,11 +34,6 @@ import AllStaffs from './pages/Staff/AllStaffs';
 // Sessions and Courses
 import Sessions from './pages/Sessions/Sessions';
 import Courses from './pages/Courses/Courses';
-
-// ITA Management
-import UploadITAAttendance from './pages/ITA/UploadITAAttendance';
-import ITAMaster from './pages/ITA/ITAMaster';
-import SignedITAAttendance from './pages/ITA/SignedITAAttendance';
 
 // Notifications
 import SendAnnouncement from './pages/Notifications/SendAnnouncement';
@@ -70,23 +56,7 @@ import MasterData from './pages/Profile/MasterData';
 
 // Update Course & Session
 import UpdateCourseSession from './pages/UpdateCourseSession';
-
-// Placeholder components for other routes
-const PlaceholderPage = ({ title }) => (
-  <div style={{ 
-    padding: '30px', 
-    textAlign: 'center', 
-    background: 'white', 
-    margin: '20px', 
-    borderRadius: '15px',
-    boxShadow: '0 5px 15px rgba(0, 0, 0, 0.08)'
-  }}>
-    <h2 style={{ color: '#2c3e50', marginBottom: '20px' }}>{title}</h2>
-    <p style={{ color: '#7f8c8d', fontSize: '1.1rem' }}>
-      This page is under development and will be available soon.
-    </p>
-  </div>
-);
+import StudentAcknowledgmentForm from './pages/Students/StudentAcknowledgmentForm';
 
 function App() {
   return (
@@ -107,15 +77,6 @@ function App() {
               </ProtectedRoute>
             } />
 
-            {/* Recent Activities Route */}
-            <Route path="/recent-activities" element={
-              <ProtectedRoute>
-                <Layout>
-                  <RecentActivities />
-                </Layout>
-              </ProtectedRoute>
-            } />
-
             {/* Sessions and Courses Routes */}
             <Route path="/sessions" element={
               <ProtectedRoute>
@@ -129,31 +90,6 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <Courses />
-                </Layout>
-              </ProtectedRoute>
-            } />
-
-            {/* ITA Management Routes */}
-            <Route path="/ita/upload-attendance" element={
-              <ProtectedRoute>
-                <Layout>
-                  <UploadITAAttendance />
-                </Layout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/ita/master" element={
-              <ProtectedRoute>
-                <Layout>
-                  <ITAMaster />
-                </Layout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/ita/signed-attendance" element={
-              <ProtectedRoute>
-                <Layout>
-                  <SignedITAAttendance />
                 </Layout>
               </ProtectedRoute>
             } />
@@ -283,21 +219,21 @@ function App() {
             } />
 
             {/* Attendance Routes */}
-            <Route path="/attendance/add" element={
+            {/* <Route path="/attendance/add" element={
               <ProtectedRoute>
                 <Layout>
                   <AddAttendance />
                 </Layout>
               </ProtectedRoute>
             } />
-            
-            <Route path="/attendance/report" element={
+             */}
+            {/* <Route path="/attendance/dashboard" element={
               <ProtectedRoute>
                 <Layout>
-                  <AttendanceReportPage />
+                  <AttendanceDashboard />
                 </Layout>
               </ProtectedRoute>
-            } />
+            } /> */}
             
             <Route path="/attendance/monthly" element={
               <ProtectedRoute>
@@ -307,77 +243,11 @@ function App() {
               </ProtectedRoute>
             } />
 
-            {/* Grades Routes */}
-            <Route path="/grades/category" element={
-              <ProtectedRoute>
-                <Layout>
-                  <GradeCategory />
-                </Layout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/grades/columns" element={
-              <ProtectedRoute>
-                <Layout>
-                  <GradeColumns />
-                </Layout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/grades/add" element={
-              <ProtectedRoute>
-                <Layout>
-                  <Grade />
-                </Layout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/grades/all" element={
-              <ProtectedRoute>
-                <Layout>
-                  <AllGrades />
-                </Layout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/grades/consolidated" element={
-              <ProtectedRoute>
-                <Layout>
-                  <ConsolidatedGrade />
-                </Layout>
-              </ProtectedRoute>
-            } />
-
-            {/* Reports Routes */}
-            <Route path="/reports/attendance" element={
-              <ProtectedRoute>
-                <Layout>
-                  <AttendanceReport />
-                </Layout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/reports/midterm" element={
-              <ProtectedRoute>
-                <Layout>
-                  <MidtermReport />
-                </Layout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/reports/student-progress" element={
-              <ProtectedRoute>
-                <Layout>
-                  <StudentProgressReport />
-                </Layout>
-              </ProtectedRoute>
-            } />
-
             {/* Applications Routes */}
             <Route path="/applications/applied-candidates" element={
               <ProtectedRoute>
                 <Layout>
-                  <AppliedCandidates />
+                  <AllAppliedCandidates />
                 </Layout>
               </ProtectedRoute>
             } />
@@ -471,6 +341,9 @@ function App() {
                 </Layout>
               </ProtectedRoute>
             } />
+
+            {/* Student Acknowledgment Route */}
+            <Route path="/student-acknowledgment/:email" element={<StudentAcknowledgmentForm />} />
 
             {/* Default redirect to dashboard */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />

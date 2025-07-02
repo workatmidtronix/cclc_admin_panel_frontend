@@ -6,7 +6,7 @@ export const getApplications = async (searchTerm = '') => {
     const url = searchTerm ? `${API_BASE_URL}?search=${encodeURIComponent(searchTerm)}` : API_BASE_URL;
     const response = await fetch(url);
     const data = await response.json();
-    
+    console.log("applications",data)
     if (!response.ok) {
       throw new Error(data.message || 'Failed to fetch applications');
     }
