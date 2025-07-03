@@ -498,6 +498,18 @@ function StudentDetailsModal({ student, onClose }) {
                   </FileLink>
                 </td>
               </tr>
+              <tr>
+                <th>Emergency Contact Form</th>
+                <td colSpan={3}>
+                  <FileLink
+                    as="button"
+                    style={{ background: 'none', border: 'none', color: '#3366cc', cursor: 'pointer', textDecoration: 'underline', fontSize: '0.97rem' }}
+                    onClick={() => window.open(`/student-emergency-contact/${details.student.email}`, '_blank')}
+                  >
+                    View Emergency Contact Form
+                  </FileLink>
+                </td>
+              </tr>
             </tbody>
           </DetailsTable>
 
@@ -730,7 +742,7 @@ const StudentList = () => {
                 <Td style={{ fontWeight: '500' }}>{student.id}</Td>
                 <Td style={{ fontWeight: '500' }}>{student.lastName}</Td>
                 <Td style={{ fontWeight: '500' }}>{student.firstName}</Td>
-                <Td style={{ color: 'rgb(51, 66, 147);' }}>{student.email}</Td>
+                <Td style={{ color: 'rgb(51, 66, 147)' }}>{student.email}</Td>
                 <Td>{student.gender}</Td>
                 <Td style={{ fontFamily: 'Courier New, monospace' }}>
                   {student.phone}

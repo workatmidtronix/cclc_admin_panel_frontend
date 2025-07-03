@@ -304,11 +304,6 @@ const AddStudent = () => {
     password: ''
   });
 
-console.log(formData);
-console.log(formData.course);
-console.log(formData.session);
-
-
   const validateForm = () => {
     const errors = {};
     const requiredFields = [
@@ -479,12 +474,7 @@ console.log(formData.session);
       fileFields.forEach(({ name, field }) => {
       
         if (field instanceof File) {
-          console.log(`Appending file ${name}:`, {
-            name: field.name,
-            type: field.type,
-            size: field.size,
-            lastModified: field.lastModified
-          });
+        
           formDataToSend.append(name, field, field.name);
         } else {
           console.log(`No file for ${name} or not a File instance`);

@@ -164,8 +164,9 @@ const Sidebar = () => {
         { id: 'add-student', label: 'Add Student', path: '/students/add' },
         { id: 'student-list', label: 'Student List', path: '/students/list' },
         ...(isAdmin ? [
-          { id: 'assign-session', label: 'Assign Session', path: '/students/assign-session' },
-          { id: 'previous-course', label: 'Previous Course', path: '/students/previous-course' }
+                  { id: 'assign-session', label: 'Assign Session', path: '/students/assign-session' },
+        { id: 'previous-course', label: 'Previous Course', path: '/students/previous-course' },
+        { id: 'vouchers', label: 'Vouchers', path: '/students/vouchers' }
         ] : [])
       ]
     },

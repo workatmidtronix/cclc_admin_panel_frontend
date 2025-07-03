@@ -5,7 +5,7 @@ export const fetchDashboardStats = createAsyncThunk(
   'dashboard/fetchStats',
   async (_, { rejectWithValue }) => {
     try {
-      console.log('Fetching dashboard stats...');
+
       const response = await fetch('/api/dashboard/stats', {
         method: 'GET',
         headers: {
@@ -14,8 +14,7 @@ export const fetchDashboardStats = createAsyncThunk(
         credentials: 'include',
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
+
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -24,7 +23,7 @@ export const fetchDashboardStats = createAsyncThunk(
       }
 
       const data = await response.json();
-      console.log('Dashboard stats data:', data);
+
       return data.stats;
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);

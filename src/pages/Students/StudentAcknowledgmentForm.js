@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { useEnrollmentFormData } from './StudentEnrollmentFormContext';
 
 const Container = styled.div`
   max-width: 700px;
@@ -104,30 +105,8 @@ const ErrorMessage = styled.div`
 
 const StudentAcknowledgmentForm = () => {
   const { email } = useParams();
-  const [student, setStudent] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: student, loading, error } = useEnrollmentFormData();
   const docRef = useRef();
-
-  useEffect(() => {
-    const fetchStudent = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/students/enrollment-forms/${email}`);
-        const data = await response.json();
-        if (data.success) {
-          setStudent(data.student);
-        } else {
-          setError(data.message || 'Student not found');
-        }
-      } catch (err) {
-        setError('Error loading student information');
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (email) fetchStudent();
-  }, [email]);
 
   const handleDownload = async () => {
     const input = docRef.current;
@@ -135,7 +114,6 @@ const StudentAcknowledgmentForm = () => {
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
     const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
     const imgProps = pdf.getImageProperties(imgData);
     const pdfWidth = pageWidth - 40;
     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;

@@ -57,6 +57,9 @@ import MasterData from './pages/Profile/MasterData';
 // Update Course & Session
 import UpdateCourseSession from './pages/UpdateCourseSession';
 import StudentAcknowledgmentForm from './pages/Students/StudentAcknowledgmentForm';
+import StudentEmergencyContactForm from './pages/Students/StudentEmergencyContactForm';
+import Vouchers from './pages/Students/Vouchers';
+import { StudentEnrollmentFormProvider } from './pages/Students/StudentEnrollmentFormContext';
 
 function App() {
   return (
@@ -180,6 +183,14 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <PreviousCourse />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/students/vouchers" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Vouchers />
                 </Layout>
               </ProtectedRoute>
             } />
@@ -343,7 +354,17 @@ function App() {
             } />
 
             {/* Student Acknowledgment Route */}
-            <Route path="/student-acknowledgment/:email" element={<StudentAcknowledgmentForm />} />
+            <Route path="/student-acknowledgment/:email" element={
+              <StudentEnrollmentFormProvider email={window.location.pathname.split('/').pop()}>
+                <StudentAcknowledgmentForm />
+              </StudentEnrollmentFormProvider>
+            } />
+            {/* Emergency Contact Form (view only) */}
+            <Route path="/student-emergency-contact/:email" element={
+              <StudentEnrollmentFormProvider email={window.location.pathname.split('/').pop()}>
+                <StudentEmergencyContactForm />
+              </StudentEnrollmentFormProvider>
+            } />
 
             {/* Default redirect to dashboard */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />

@@ -571,8 +571,8 @@ const AllAppliedCandidates = () => {
           dateOfJoining: formattedDateOfJoining, // Use formatted date
           status: 'Active',
           // Generate login ID and password for the new student
-          loginId: `${(application.first_name || 'user').toLowerCase()}${(application.last_name || 'name').toLowerCase()}${Date.now()}`,
-          password: `Welcome${new Date().getFullYear()}!`
+          loginId: application.login_id || '',
+          password: application.password || ''
         })
       });
 
